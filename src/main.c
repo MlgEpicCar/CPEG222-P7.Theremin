@@ -6,6 +6,7 @@
 #include "OLED.h"
 #include "eyes.h"
 #include "audio.h"
+#include "NeoPixel.h"
 #include "SysClock180MHz.h"
 #include <stdint.h> // Include stdint.h for uint32_t type
 #include <stdio.h> // Include stdio.h for snprintf function
@@ -17,6 +18,26 @@
 void delay_ms(uint32_t ms); // Function prototype for delay function
 char buffer[90];
 static const char *noteSymbols[] = {"C4", "C#4", "D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4", "OFF"};
+
+typedef struct {
+    uint8_t     r, g, b;
+} RGB_Colors;
+
+static const RGB_Colors color_table[13] = {
+    {  0,   0, 255},
+    {  0,  93, 255},
+    {  0, 185, 255},
+    {  0, 255, 232},
+    {  0, 255, 139},
+    {  0, 255,  46},
+    { 46, 255,   0},
+    {139, 255,   0},
+    {232, 255,   0},
+    {255, 185,   0},
+    {255,  93,   0},
+    {255,   0,   0},
+    {  0,   0,   0}
+};
 uint32_t initialClock; // Initial system clock frequency (16 MHz)
 uint32_t finalClock;   // Final system clock frequency (180 MHz)
 
@@ -42,6 +63,7 @@ int main(void){
     SSD_Timer_Init();
     eyes_Init();
     Audio_Init();
+    NeoPixel_Init();
 
     // SH1106_RenderFullScreenLogo();
     // delay_ms(2000); // Delay for 2 seconds to display the logo
@@ -97,6 +119,13 @@ int main(void){
             
             snprintf(buffer, sizeof(buffer), "Note: %s   ", noteSymbols[note]);
             OLED_Print(5, 1*6, buffer);
+
+            // Fixed-color test
+            NeoPixel_SetPixel(0, color_table[note].r, color_table[note].g, color_table[note].b);
+            NeoPixel_SetPixel(1, color_table[note].r, color_table[note].g, color_table[note].b);
+            NeoPixel_SetPixel(2, color_table[note].r, color_table[note].g, color_table[note].b);
+            NeoPixel_SetPixel(3, color_table[note].r, color_table[note].g, color_table[note].b);
+            NeoPixel_Show();
 
             Audio_UpdateDistance(distance_hundredths);
         }
