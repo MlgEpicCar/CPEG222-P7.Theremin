@@ -5,6 +5,7 @@
 #include "stm32f4xx.h"
 #include "OLED.h"
 #include "eyes.h"
+#include "audio.h"
 #include "SysClock180MHz.h"
 #include <stdint.h> // Include stdint.h for uint32_t type
 #include <stdio.h> // Include stdio.h for snprintf function
@@ -39,6 +40,7 @@ int main(void){
     SSD_Init();
     SSD_Timer_Init();
     eyes_Init();
+    Audio_Init();
 
     // SH1106_RenderFullScreenLogo();
     // delay_ms(2000); // Delay for 2 seconds to display the logo
@@ -50,15 +52,11 @@ int main(void){
         // Main loop
         uint32_t pulse_us;
         uint32_t distance_hundredths;
-        uint32_t divisor;
-        uint8_t use_inches;
-
-        /* S1 = 1: inches. S1 = 0: centimeters. */
-        use_inches = (SWITCH_PORT->IDR & (1U << S1)) ? 1U : 0U;
-        divisor = use_inches ? 148U : 58U;
+        uint32_t divisor = 148U;
 
         /* Start a new measurement. */
         eyes_Trigger();
+        Audio_UpdateSwitch();
 
         delay_ms(40U); // Allow time for echo to return.
 
@@ -67,7 +65,7 @@ int main(void){
         if (pulse_us == 0U)
         {
             OLED_Print(3, 1*6, "No echo detected ");
-            snprintf(buffer, sizeof(buffer), "Dist: ??.?? %s   ", use_inches ? "in" : "cm");
+            snprintf(buffer, sizeof(buffer), "Dist: ??.?? %s   ", "in");
             OLED_Print(4, 1*6, buffer);
         } else {
             /* Rounded distance in hundredths of the selected unit. */
@@ -83,7 +81,7 @@ int main(void){
                      "Dist: %lu.%02lu %s   ",
                      (unsigned long)(distance_hundredths / 100U),
                      (unsigned long)(distance_hundredths % 100U),
-                     use_inches ? "in" : "cm");
+                     "in");
             OLED_Print(4, 1*6, buffer);
 
             snprintf(buffer, sizeof(buffer),
@@ -91,8 +89,13 @@ int main(void){
                      (unsigned long)pulse_us,
                      (unsigned long)(distance_hundredths / 100U),
                      (unsigned long)(distance_hundredths % 100U),
-                     use_inches ? "in" : "cm");
+                     "in");
 
+            uint32_t note = Audio_UpdateDistance(distance_hundredths);
+            snprintf(buffer, sizeof(buffer), "Note: %lu   ", (unsigned long)note);
+            OLED_Print(5, 1*6, buffer);
+
+            Audio_UpdateDistance(distance_hundredths);
         }
 
         /* Approximately 40 ms measurement wait + 210 ms delay. */
