@@ -212,7 +212,7 @@ void Audio_Init(void)
 // PLAY A FREQUENCY
 // --------------------------------------------------
 
-void Audio_SetFrequency(uint32_t frequency_hz)
+void Audio_SetFrequency(float frequency_hz)
 {
     current_frequency = frequency_hz;
 
@@ -327,12 +327,13 @@ void Audio_UpdateSwitch(void)
 static int current_note = -1;
 uint32_t Audio_UpdateDistance(uint32_t distance_hundredths)
 {
-    static const uint16_t notes[12] =
-        {262,277,294,311,330,349,370,392,415,440,466,494};
+    static const float notes[13] =
+        {261.63,277.18,293.66,311.13,329.63,349.23,369.99,392.00,415.30,440.00,466.16,493.88,0.0};
 
     uint32_t inches = distance_hundredths / 100U;
     if (inches < 4U) inches = 4U;
-    if (inches > 15U) return (uint32_t)current_note;   // out of range: keep last note
+    if (inches > 15U) {
+        Audio_Stop();}
 
     int new_note = (int)(inches - 4U);
     if (new_note != current_note)

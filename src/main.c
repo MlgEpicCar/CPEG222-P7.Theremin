@@ -16,6 +16,7 @@
 
 void delay_ms(uint32_t ms); // Function prototype for delay function
 char buffer[90];
+static const char *noteSymbols[] = {"C4", "C#4", "D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4", "OFF"};
 uint32_t initialClock; // Initial system clock frequency (16 MHz)
 uint32_t finalClock;   // Final system clock frequency (180 MHz)
 
@@ -92,7 +93,9 @@ int main(void){
                      "in");
 
             uint32_t note = Audio_UpdateDistance(distance_hundredths);
-            snprintf(buffer, sizeof(buffer), "Note: %lu   ", (unsigned long)note);
+            if ((unsigned long)note > 12) {note = 12;}
+            
+            snprintf(buffer, sizeof(buffer), "Note: %s   ", noteSymbols[note]);
             OLED_Print(5, 1*6, buffer);
 
             Audio_UpdateDistance(distance_hundredths);
