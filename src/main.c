@@ -105,7 +105,7 @@ int main(void){
         delay_ms(210U);
 
         SSD_Refresh();
-        SSD_DisplayValue(pulse_us);
+        SSD_DisplayValue((int32_t)(Audio_GetCurrentNote() * 100)/10);
     }   
 
     return 0; // Program should never reach here due to infinite loop

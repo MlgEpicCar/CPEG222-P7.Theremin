@@ -8,6 +8,6 @@ void Audio_SetFrequency(float frequency_hz);
 void Audio_Stop(void);
 void Audio_UpdateSwitch(void);
 uint32_t Audio_UpdateDistance(uint32_t distance_hundredths);
-int Audio_GetCurrentNote(void);
+float Audio_GetCurrentNote(void);
 
 #endif

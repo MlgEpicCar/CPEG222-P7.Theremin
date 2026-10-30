@@ -325,11 +325,11 @@ void Audio_UpdateSwitch(void)
 // DISTANCE TO FREQUENCY MAPPING
 // --------------------------------------------------
 static int current_note = -1;
-uint32_t Audio_UpdateDistance(uint32_t distance_hundredths)
-{
-    static const float notes[13] =
+static const float notes[13] =
         {261.63,277.18,293.66,311.13,329.63,349.23,369.99,392.00,415.30,440.00,466.16,493.88,0.0};
 
+uint32_t Audio_UpdateDistance(uint32_t distance_hundredths)
+{
     uint32_t inches = distance_hundredths / 100U;
     if (inches < 4U) inches = 4U;
     if (inches > 15U) {
@@ -344,8 +344,7 @@ uint32_t Audio_UpdateDistance(uint32_t distance_hundredths)
     return (uint32_t)current_note;
 }
 
-int Audio_GetCurrentNote(void)
+float Audio_GetCurrentNote(void)
 {
-    // This must be the same current_note used by Audio_UpdateDistance.
-    return current_note;
+    return notes[current_note];
 }
